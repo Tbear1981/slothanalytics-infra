@@ -16,9 +16,9 @@ services:
       # JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
     volumes:
       - jenkins_home:/var/jenkins_home
-      # Uncomment to let pipeline jobs use the host Docker daemon (same VPS):
-      # - /var/run/docker.sock:/var/run/docker.sock
-      # If you mount the socket, install Docker CLI via a custom image or Jenkins tools.
+      # Required for Pipeline jobs using `agent { docker { ... } }` (e.g. datafordeler_regnskab).
+      # Install CLI in container: docker-compose exec -u root jenkins bash -lc 'apt-get update && apt-get install -y docker.io'
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   jenkins_home:
