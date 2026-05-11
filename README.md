@@ -4,6 +4,8 @@ Shared **Jenkins** operations for Sloth Analytics: run the controller with Docke
 
 Application source code lives in separate repos (for example **`datafordeler_regnskab`**). Those repos keep only a root **`Jenkinsfile`** (and app docs). **This repo** holds Jenkins itself plus XML/script tooling that references other repos via **`GIT_URL`**.
 
+**GitHub:** [Tbear1981/slothanalytics-infra](https://github.com/Tbear1981/slothanalytics-infra) — transfer or fork to a **`slothanalytics`** org when you are ready; update clone URLs in your notes.
+
 ## Prerequisites
 
 - Docker Engine + Docker Compose v2 (`docker compose`)
@@ -12,7 +14,7 @@ Application source code lives in separate repos (for example **`datafordeler_reg
 ## Quick start
 
 ```bash
-git clone https://github.com/<org-or-user>/slothanalytics-infra.git
+git clone https://github.com/Tbear1981/slothanalytics-infra.git
 cd slothanalytics-infra
 cp .env.example .env   # optional edits
 docker compose up -d

@@ -24,7 +24,7 @@ JAR="$ROOT/cli/jenkins-cli.jar"
 URL="${JENKINS_URL:-http://127.0.0.1:8080}"
 
 if [[ ! -f "$JAR" ]]; then
-  echo "Missing $JAR — run first from repo jenkins/ folder:" >&2
+  echo "Missing $JAR — run from this repository root:" >&2
   echo "  ./scripts/download-cli.sh" >&2
   exit 1
 fi

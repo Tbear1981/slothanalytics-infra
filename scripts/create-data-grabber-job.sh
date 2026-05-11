@@ -2,11 +2,13 @@
 # Create or update the Pipeline job "from SCM" via jenkins-cli (no GUI).
 #
 # Prereqs:
-#   - jenkins/cli/jenkins-cli.jar (./scripts/download-cli.sh)
-#   - jenkins/.env with JENKINS_URL, JENKINS_AUTH, and GIT_URL (see .env.example)
+#   - cli/jenkins-cli.jar (./scripts/download-cli.sh)
+#   - .env with JENKINS_URL, JENKINS_AUTH, and GIT_URL (see .env.example)
+#
+# GIT_URL must be the application repo HTTPS URL (e.g. datafordeler_regnskab), not slothanalytics-infra.
 #
 # Usage:
-#   cd jenkins && ./scripts/create-data-grabber-job.sh
+#   ./scripts/create-data-grabber-job.sh
 #   JENKINS_JOB_NAME=my-job ./scripts/create-data-grabber-job.sh
 #
 set -euo pipefail
@@ -27,7 +29,7 @@ TEMPLATE="$ROOT/job-xml/data-grabber-pipeline.xml.template"
 CLI="$ROOT/scripts/jenkins-cli.sh"
 
 if [[ -z "$GIT_URL" ]]; then
-  echo "Set GIT_URL in jenkins/.env (HTTPS clone URL of this repo)." >&2
+  echo "Set GIT_URL in .env (HTTPS clone URL of the application repo, e.g. datafordeler_regnskab)." >&2
   exit 1
 fi
 

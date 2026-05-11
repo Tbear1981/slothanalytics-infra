@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Create or update the "create GitHub repo" Pipeline job (loads Jenkinsfile from this repo).
 #
-# Prereqs: same as create-data-grabber-job.sh — jenkins-cli.jar + jenkins/.env with GIT_URL.
+# Prereqs: jenkins-cli.jar + .env — GIT_URL must be THIS repo (slothanalytics-infra) for SCM checkout.
 #
 # Usage:
-#   cd jenkins && ./scripts/create-github-repo-job.sh
+#   ./scripts/create-github-repo-job.sh
 #   JENKINS_JOB_NAME=bootstrap-github-repo ./scripts/create-github-repo-job.sh
 #
 set -euo pipefail
@@ -25,7 +25,7 @@ TEMPLATE="$ROOT/job-xml/create-github-repo-pipeline.xml.template"
 CLI="$ROOT/scripts/jenkins-cli.sh"
 
 if [[ -z "$GIT_URL" ]]; then
-  echo "Set GIT_URL in jenkins/.env (HTTPS clone URL of this repo)." >&2
+  echo "Set GIT_URL in .env (HTTPS clone URL of slothanalytics-infra — the repo that contains Jenkinsfile.githubCreateRepo)." >&2
   exit 1
 fi
 
@@ -49,7 +49,7 @@ GIT_URL="$GIT_URL" GIT_CREDENTIALS_ID="$GIT_CREDENTIALS_ID" GIT_BRANCH="$GIT_BRA
 ' "$TEMPLATE" > "$TMP"
 
 echo "Applying job XML for: $JOB_NAME"
-echo "  Script path: jenkins/Jenkinsfile.githubCreateRepo"
+echo "  Script path: Jenkinsfile.githubCreateRepo"
 
 if "$CLI" get-job "$JOB_NAME" >/dev/null 2>&1; then
   echo "Updating existing job..."
