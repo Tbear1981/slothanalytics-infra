@@ -1,0 +1,50 @@
+// Example Declarative Pipeline — copy to Jenkins job config or add Jenkinsfile to repo.
+// Triggers: configure "Poll SCM" e.g. H/5 * * * * or GitHub webhook → Jenkins.
+
+pipeline {
+  agent any
+
+  options {
+    timestamps()
+    disableConcurrentBuilds(abortPrevious: true)
+  }
+
+  triggers {
+    // Poll GitHub every ~5 minutes (replace with webhook when Jenkins is reachable from internet)
+    pollSCM('H/5 * * * *')
+  }
+
+  environment {
+    CI = 'true'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Sanity') {
+      steps {
+        sh 'echo "Replace with: npm ci, pytest, docker build, or ssh to VPS worker"'
+      }
+    }
+
+    // Example: run repo scripts when this Jenkinsfile lives in the same repo
+    // stage('Data pipeline') {
+    //   steps {
+    //     dir('data-grabber-crawler-ts') {
+    //       sh 'npm ci && npm run build'
+    //       sh 'npm run crawl -- daily --dry-run'
+    //     }
+    //   }
+    // }
+  }
+
+  post {
+    always {
+      cleanWs()
+    }
+  }
+}

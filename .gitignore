@@ -1,0 +1,4 @@
+.env
+
+# Downloaded from running Jenkins (see scripts/download-cli.sh)
+cli/jenkins-cli.jar
