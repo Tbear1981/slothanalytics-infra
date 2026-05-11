@@ -8,7 +8,7 @@ Application source code lives in separate repos (for example **`datafordeler_reg
 
 ## Prerequisites
 
-- Docker Engine + Docker Compose v2 (`docker compose`)
+- Docker Engine + Compose (**`docker compose`** v2 plugin *or* legacy **`docker-compose`** — some VPS images only have the hyphenated CLI).
 - Firewall: open **8080** (or whatever you set in `.env`) if you need the UI from your laptop
 
 ## Quick start
@@ -17,7 +17,7 @@ Application source code lives in separate repos (for example **`datafordeler_reg
 git clone https://github.com/Tbear1981/slothanalytics-infra.git
 cd slothanalytics-infra
 cp .env.example .env   # optional edits
-docker compose up -d
+docker compose up -d    # or: docker-compose up -d
 ```
 
 Open **http://\<VPS-IP\>:8080** (or `localhost` if you tunnel).
@@ -25,7 +25,7 @@ Open **http://\<VPS-IP\>:8080** (or `localhost` if you tunnel).
 ### First-time unlock
 
 ```bash
-docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword   # or docker-compose …
 ```
 
 Paste the password in the UI, install **suggested plugins**, create an admin user.
@@ -66,9 +66,18 @@ Create a **Multibranch Pipeline** job pointing at your GitHub repo, or a **Pipel
 
 ## Running pipelines that need Docker
 
-The compose file can mount **`/var/run/docker.sock`** from the host (commented). That lets jobs run `docker` on the **host** daemon. Security note: jobs then have substantial control over the host; restrict who can run jobs and prefer dedicated agents for untrusted code.
+**`docker-compose.yml` mounts **`/var/run/docker.sock`** into the Jenkins container** so Pipeline jobs can use **`agent { docker { … } }`** (required for **`datafordeler_regnskab`**’s **`Jenkinsfile`**).
 
-Alternatively install **Docker CLI + Docker Compose** inside a **custom image** built `FROM jenkins/jenkins:lts-jdk17`.
+You still need the **Docker CLI** inside the controller image (not shipped by default) and permission to use the socket (host Docker group GID). On a fresh container:
+
+```bash
+docker-compose exec -T -u root jenkins bash -lc 'apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*'
+GID=$(stat -c %g /var/run/docker.sock)
+docker-compose exec -T -u root jenkins bash -lc "getent group $GID || groupadd -g $GID hostdocker; usermod -aG $GID jenkins"
+docker-compose restart jenkins
+```
+
+Security note: mounting the socket gives jobs substantial control over the host daemon — restrict who can run jobs; prefer dedicated agents for untrusted code.
 
 ## Backups
 
