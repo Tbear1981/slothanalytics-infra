@@ -13,6 +13,8 @@ services:
       - "${JENKINS_AGENT_PORT:-50000}:50000"
     environment:
       TZ: ${TZ:-Europe/Copenhagen}
+      # Serve Jenkins UI/API under https://<host>/jenkins
+      JENKINS_OPTS: "--prefix=/jenkins"
       # Skip setup wizard only if you know what you're doing (not recommended for first install):
       # JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
     volumes:
