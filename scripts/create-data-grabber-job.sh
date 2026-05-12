@@ -47,9 +47,9 @@ if ! command -v perl >/dev/null 2>&1; then
 fi
 
 GIT_URL="$GIT_URL" GIT_CREDENTIALS_ID="$GIT_CREDENTIALS_ID" GIT_BRANCH="$GIT_BRANCH" perl -pe '
-  s/@GIT_URL@/$ENV{GIT_URL}/g;
-  s/@GIT_CREDENTIALS_ID@/$ENV{GIT_CREDENTIALS_ID}/g;
-  s/@GIT_BRANCH@/$ENV{GIT_BRANCH}/g;
+  s/\@GIT_URL\@/$ENV{GIT_URL}/g;
+  s/\@GIT_CREDENTIALS_ID\@/$ENV{GIT_CREDENTIALS_ID}/g;
+  s/\@GIT_BRANCH\@/$ENV{GIT_BRANCH}/g;
 ' "$TEMPLATE" > "$TMP"
 
 echo "Applying job XML for: $JOB_NAME"
