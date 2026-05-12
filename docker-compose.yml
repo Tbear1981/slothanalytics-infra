@@ -4,7 +4,8 @@
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    # Jenkins 2.555.1+ LTS requires Java 21+ on controller; jdk17 images are retired.
+    image: jenkins/jenkins:lts-jdk21
     container_name: jenkins
     restart: unless-stopped
     ports:

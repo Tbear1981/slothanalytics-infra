@@ -11,7 +11,39 @@ This doc applies to the **[datafordeler_regnskab](https://github.com/Tbear1981/d
 
 If you **cannot** use Docker agents, edit the app repo’s **`Jenkinsfile`** `agent { docker { ... } }` block and replace it with `agent any`, and install **Node ≥ 20** on the agent.
 
-## One-time: secret file credential
+## Repeatable setup (CLI only — no Jenkins UI)
+
+From this (**slothanalytics-infra**) repo root: **`cp .env.example .env`**, then set **`JENKINS_URL`**, **`JENKINS_AUTH`** (user:API token), and **`GIT_URL`** (HTTPS URL of **`datafordeler_regnskab`**).
+
+### One shot: credential + job
+
+Fill **`data-grabber-crawler-ts/.env`** locally from **`.env.example`** (same fields as for dry-run). Do **not** commit real secrets.
+
+```bash
+chmod +x scripts/*.sh
+DATA_GRABBER_ENV_FILE=/absolute/path/to/datafordeler_regnskab/data-grabber-crawler-ts/.env \
+  ./scripts/setup-datafordeler-job.sh
+```
+
+This downloads **`jenkins-cli.jar`** if needed, imports **Secret file** credential ID **`data-grabber-env`** (or override with **`JENKINS_CREDENTIAL_ID_DATA_GRABBER_ENV`**), creates or updates the Pipeline-from-SCM job, then you can run **`./scripts/trigger-build.sh`**.
+
+### Job only (no secret upload)
+
+```bash
+./scripts/download-cli.sh          # once
+./scripts/create-data-grabber-job.sh
+./scripts/trigger-build.sh         # optional: RUN_ES_DRY_RUN=false
+```
+
+### Credential only
+
+```bash
+./scripts/import-data-grabber-env-credential.sh /path/to/data-grabber-crawler-ts/.env
+```
+
+Uses **`credentials-templates/data-grabber-env.xml.template`** and **`create-credentials-by-xml`** / **`update-credentials-by-xml`**. If Jenkins rejects the XML (plugin version mismatch), add the **Secret file** once in the UI, then adjust the template to match the XML your server expects (Plain Credentials plugin version).
+
+## Fallback: secret file credential in the UI
 
 1. Fill **`data-grabber-crawler-ts/.env`** locally from **`.env.example`** (at minimum **`S3_BUCKET`** for the crawler CLI — dry-run still loads env).
 2. Jenkins → **Manage Jenkins** → **Credentials** → (your domain) → **Add Credentials**.
@@ -19,11 +51,7 @@ If you **cannot** use Docker agents, edit the app repo’s **`Jenkinsfile`** `ag
 4. Upload that `.env` file.
 5. **ID** must be exactly: **`data-grabber-env`** (the **`Jenkinsfile`** references this ID).
 
-Do **not** commit real `.env` to Git.
-
-## Create the job
-
-### Option A — Jenkins UI
+## Fallback: create the job in the UI
 
 1. **New Item** → name e.g. `datafordeler-regnskab` → **Pipeline** → OK.
 2. **Pipeline** → Definition: **Pipeline script from SCM**.
@@ -31,22 +59,11 @@ Do **not** commit real `.env` to Git.
 4. **Script Path**: **`Jenkinsfile`**.
 5. Save → **Build Now**.
 
-### Option B — CLI (`jenkins-cli`)
+Optional settings when using scripts instead of the UI: **`GIT_CREDENTIALS_ID`**, **`GIT_BRANCH`**, **`JENKINS_JOB_NAME`** in **`.env`**.
 
-From this (**slothanalytics-infra**) repository root (after **`cp .env.example .env`** and setting **`JENKINS_URL`** / **`JENKINS_AUTH`**):
+**`create-data-grabber-job.sh`** reads **`job-xml/data-grabber-pipeline.xml.template`** and runs **`create-job`** or **`update-job`**.
 
-1. Set **`GIT_URL`** to the **application** repo HTTPS URL (**`datafordeler_regnskab`**).
-2. Optionally set **`GIT_CREDENTIALS_ID`**, **`GIT_BRANCH`**, **`JENKINS_JOB_NAME`**.
-
-```bash
-./scripts/download-cli.sh          # once: jenkins-cli.jar
-./scripts/create-data-grabber-job.sh
-./scripts/trigger-build.sh           # optional: RUN_ES_DRY_RUN=false
-```
-
-This reads **`job-xml/data-grabber-pipeline.xml.template`** and runs **`create-job`** or **`update-job`**.
-
-If Jenkins rejects the XML (plugin mismatch), create the job once in the UI, run **`jenkins-cli get-job datafordeler-regnskab > backup.xml`**, and compare.
+If Jenkins rejects the XML (plugin mismatch), create the job once in the UI, run **`./scripts/jenkins-cli.sh get-job datafordeler-regnskab > backup.xml`**, and compare.
 
 ### Parameters
 

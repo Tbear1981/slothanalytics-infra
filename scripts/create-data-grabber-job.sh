@@ -65,4 +65,5 @@ else
   "$CLI" create-job "$JOB_NAME" < "$TMP"
 fi
 
-echo "Done. Open Jenkins → $JOB_NAME → Build Now (or: ./scripts/trigger-build.sh)"
+echo "Done. Trigger: ./scripts/trigger-build.sh"
+echo "Full CLI bootstrap (optional env upload): ./scripts/setup-datafordeler-job.sh — see DATA_GRABBER.md"

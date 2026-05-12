@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl>
+  <scope>GLOBAL</scope>
+  <id>@CREDENTIAL_ID@</id>
+  <description>data-grabber crawler env (secret file)</description>
+  <fileName>.env</fileName>
+  <secretBytes>@BASE64_CONTENT@</secretBytes>
+</org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl>

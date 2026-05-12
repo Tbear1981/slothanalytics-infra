@@ -98,7 +98,7 @@ docker run --rm -v slothanalytics_jenkins_home:/from -v "$(pwd):/backup" alpine 
 
 The **[datafordeler_regnskab](https://github.com/Tbear1981/datafordeler_regnskab)** repo contains the pipeline definition at its root **`Jenkinsfile`**.
 
-To register that job from this repo’s CLI, set **`GIT_URL`** in **`.env`** to the **HTTPS clone URL of `datafordeler_regnskab`**, then run **`./scripts/create-data-grabber-job.sh`**. Credentials for the crawler (`data-grabber-env`) are documented in **[DATA_GRABBER.md](DATA_GRABBER.md)**.
+To register that job **without using the Jenkins UI**, set **`GIT_URL`** in **`.env`** to the **HTTPS clone URL of `datafordeler_regnskab`**, then run **`./scripts/setup-datafordeler-job.sh`** (optional: set **`DATA_GRABBER_ENV_FILE`** to import the **`data-grabber-env`** secret file in the same step). Step-by-step and UI fallbacks are in **[DATA_GRABBER.md](DATA_GRABBER.md)**.
 
 ## Create GitHub repositories from Jenkins
 
@@ -117,9 +117,12 @@ See **[GITHUB_CREATE_REPO.md](GITHUB_CREATE_REPO.md)** and **`scripts/create-git
 | `GITHUB_CREATE_REPO.md` | Token scopes + credential ID + job setup |
 | `job-xml/create-github-repo-pipeline.xml.template` | Pipeline-from-SCM XML for the bootstrap job |
 | `scripts/create-github-repo-job.sh` | **`create-job` / `update-job`** for that XML template |
-| `DATA_GRABBER.md` | **datafordeler** job: credentials + `GIT_URL` = app repo |
+| `DATA_GRABBER.md` | **datafordeler** job: repeatable CLI flow + UI fallbacks |
+| `credentials-templates/data-grabber-env.xml.template` | Secret file credential XML for **`import-data-grabber-env-credential.sh`** |
 | `scripts/download-cli.sh` | Downloads `cli/jenkins-cli.jar` from `/jnlpJars/` |
 | `scripts/jenkins-cli.sh` | Runs CLI (`help`, `version`, `list-jobs`, …) |
+| `scripts/import-data-grabber-env-credential.sh` | **`create-credentials-by-xml`** / **`update-credentials-by-xml`** for **`data-grabber-env`** |
+| `scripts/setup-datafordeler-job.sh` | One-shot: CLI jar + optional env import + **`create-data-grabber-job.sh`** |
 | `scripts/create-data-grabber-job.sh` | **`create-job` / `update-job`** for the datafordeler pipeline template |
 | `scripts/trigger-build.sh` | **`build`** with optional `-p name=value` params |
-| `job-xml/data-grabber-pipeline.xml.template` | Pipeline-from-SCM job → checkout **app** repo, script **`Jenkinsfile`** |
+| `deploy/happiness-checker-nginx-ssl.conf` | Example **nginx** for **happiness-checker.com**: `/api/` → AI agent, Jenkins paths → **`jenkins:8080`** (requires **`docker network connect happiness-network jenkins`**) |
